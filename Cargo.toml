@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Peter Howell <peter.e.howell@gmail.com>"]
 
 [dependencies]
+tcod = "0.12.1"
+specs = "0.10.0"
