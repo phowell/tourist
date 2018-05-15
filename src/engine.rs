@@ -64,9 +64,11 @@ impl<'a> Engine<'a> {
         system::set_fps(LIMIT_FPS);
 
         while self.running {
-            self.render();
-            self.root.flush();
+            self.running = !self.root.window_closed();
+            self.handle_input();
             self.update();
+            //self.render();
+            //self.root.flush();
         }
     }
 
@@ -83,7 +85,7 @@ impl<'a> Engine<'a> {
     }
     fn update(&mut self) {}
 
-    fn handle_keys(root: &mut Root) -> Option<Input> {
+    fn handle_input(root: &mut Root) -> Option<Input> {
         use tcod::input;
         use tcod::input::{Key, KeyCode::*, KeyPressFlags};
 
