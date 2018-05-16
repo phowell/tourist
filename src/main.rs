@@ -5,6 +5,7 @@ mod components;
 mod engine;
 mod entities;
 mod resources;
+mod systems;
 
 use engine::Engine;
 

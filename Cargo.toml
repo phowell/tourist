@@ -5,4 +5,4 @@ authors = ["Peter Howell <peter.e.howell@gmail.com>"]
 
 [dependencies]
 tcod = "0.12.1"
-specs = "0.10.0"
+specs = "0.11"

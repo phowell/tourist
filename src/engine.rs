@@ -1,11 +1,12 @@
 use specs::{Dispatcher, DispatcherBuilder, World};
-use tcod::{colors, system, console::{blit, FontLayout, FontType, Offscreen, Root},
-           input::{Event, KeyPressFlags}};
+use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscreen, Root},
+           input::{Event, EventFlags}};
 
 use components::{Mobile, Player, Position, Renderable};
-use resources::{Direction, Input, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
+use resources::{LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
+use systems::HandleInput;
 
-struct InputEvents(Vec<Event>);
+pub struct InputEvents(Vec<Event>);
 
 pub struct Engine<'a> {
     world: World,
@@ -17,13 +18,13 @@ pub struct Engine<'a> {
 
 impl<'a> Engine<'a> {
     pub fn new() -> Engine<'a> {
-        let mut root = Root::initializer()
+        let root = Root::initializer()
             .font("arial10x10.png", FontLayout::Tcod)
             .font_type(FontType::Greyscale)
             .size(SCREEN_WIDTH, SCREEN_HEIGHT)
             .title("Rust/libtcod tutorial")
             .init();
-        let mut console = Offscreen::new(SCREEN_WIDTH, SCREEN_HEIGHT);
+        let console = Offscreen::new(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         let mut world = World::new();
 
@@ -34,11 +35,12 @@ impl<'a> Engine<'a> {
         world.register::<Player>();
 
         //resources
-
         world.add_resource(InputEvents(Vec::new()));
 
-        let dispatcher = DispatcherBuilder::new().build();
-        //todo: add .add(system_name) as needed between new() and build();
+        let dispatcher = DispatcherBuilder::new()
+            .with(HandleInput, "HandleInput", &[])
+            .build();
+        //todo: add .with(system_name) as needed between new() and build();
 
         world
             .create_entity()
@@ -67,8 +69,8 @@ impl<'a> Engine<'a> {
             self.running = !self.root.window_closed();
             self.handle_input();
             self.update();
-            //self.render();
-            //self.root.flush();
+            self.render();
+            self.root.flush();
         }
     }
 
@@ -85,39 +87,23 @@ impl<'a> Engine<'a> {
     }
     fn update(&mut self) {}
 
-    fn handle_input(root: &mut Root) -> Option<Input> {
-        use tcod::input;
-        use tcod::input::{Key, KeyCode::*, KeyPressFlags};
+    fn handle_input(&mut self) {
+        let new_input = input::check_for_event(EventFlags::all());
+        match new_input {
+            //Did you just hit Esc?
+            Some((
+                _,
+                input::Event::Key(input::Key {
+                    code: input::KeyCode::Escape,
+                    ..
+                }),
+            )) => self.running = false,
 
-        let key = root.check_for_keypress(KeyPressFlags::empty());
-        match key {
-            Some(Key {
-                code: Enter,
-                alt: true,
-                ..
-            }) => {
-                // Alt+Enter: toggle fullscreen
-                let fullscreen = root.is_fullscreen();
-                root.set_fullscreen(!fullscreen);
-                None
-            }
-            Some(Key { code: Escape, .. }) => Some(Input::exit()), // exit game
+            //Every other input
+            Some(e) => self.world.write_resource::<InputEvents>().0.push(e.1),
 
-            // movement keys
-            Some(Key { code: Up, .. }) => Some(Input {
-                direction: Direction::N,
-                action: false,
-                exit: false,
-            }),
-            Some(Key { code: Down, .. }) => Some(Input {
-                direction: Direction::S,
-                action: false,
-                exit: false,
-            }),
-
-            None => None,
-
-            _ => None,
+            //No input occurred
+            _ => {}
         }
     }
 }
