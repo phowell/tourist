@@ -3,10 +3,8 @@ use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscree
            input::{Event, EventFlags}};
 
 use components::{Mobile, Player, Position, Renderable};
-use resources::{LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
+use resources::{InputEvents, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
 use systems::HandleInput;
-
-pub struct InputEvents(Vec<Event>);
 
 pub struct Engine<'a> {
     world: World,

@@ -1,6 +1,10 @@
+use tcod::input::Event;
+
 pub const SCREEN_WIDTH: i32 = 80;
 pub const SCREEN_HEIGHT: i32 = 50;
 pub const LIMIT_FPS: i32 = 30;
+
+pub struct InputEvents(pub Vec<Event>);
 
 pub enum Direction {
     N,
