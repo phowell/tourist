@@ -1,5 +1,3 @@
-#![warn(clippy)]
-
 extern crate specs;
 extern crate tcod;
 

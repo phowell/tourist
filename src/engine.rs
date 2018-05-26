@@ -34,7 +34,7 @@ impl<'a> Engine<'a> {
 
         //resources
         world.add_resource(InputEvents(Vec::new()));
-        let dispatcher = DispatcherBuilder::new()
+        let mut dispatcher = DispatcherBuilder::new()
             .with(HandleInput, "HandleInput", &[])
             .build();
         //todo: add .with(system_name) as needed between new() and build();
@@ -50,6 +50,8 @@ impl<'a> Engine<'a> {
             });
 
         let running = true;
+
+        
 
         Engine {
             world,
@@ -83,11 +85,12 @@ impl<'a> Engine<'a> {
         );
     }
     fn update(&mut self) {
+        self.dispatcher.dispatch(&mut self.world.res);
         self.world.maintain();
     }
 
     fn handle_input(&mut self) {
-        let new_input = input::check_for_event(EventFlags::all());
+        let new_input = input::check_for_event(input::KEY_PRESS);
         match new_input {
             //Did you just hit Esc?
             Some((
