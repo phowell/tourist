@@ -1,24 +1,22 @@
-use engine::InputEvents;
-use resources::{Direction, Input};
+use resources::{InputEvents, Direction, Input};
 use specs::Read;
 use specs::System;
 use tcod::input;
 
 pub struct HandleInput;
 
-impl<'a, InputEvents> System<'a> for HandleInput {
+impl<'a> System<'a> for HandleInput {
     type SystemData = (Read<'a, InputEvents>);
 
     fn run(&mut self, data: Self::SystemData) {
-        match data.0.pop().1 {
+        let mut d = data.0.to_owned(); 
+        println!("this should repeat");
+        match d.pop() { 
             Some(input::Event::Key(input::Key {
-                code: input::KeyCode::Up,
+                code: input::KeyCode::Char,
                 ..
-            })) => SEND_THIS_TO_PLAYER_AVATAR(Input {
-                direction: Direction::N,
-                action: false,
-            }),
-            _ => {}
+            })) => println!("test test test"), 
+            _ => println!("default case"),
         }
     }
 }

@@ -34,7 +34,6 @@ impl<'a> Engine<'a> {
 
         //resources
         world.add_resource(InputEvents(Vec::new()));
-
         let dispatcher = DispatcherBuilder::new()
             .with(HandleInput, "HandleInput", &[])
             .build();
@@ -83,7 +82,9 @@ impl<'a> Engine<'a> {
             1.0,
         );
     }
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        self.world.maintain();
+    }
 
     fn handle_input(&mut self) {
         let new_input = input::check_for_event(EventFlags::all());
