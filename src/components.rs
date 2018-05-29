@@ -1,3 +1,4 @@
+use resources::Direction;
 use specs::{Component, NullStorage, VecStorage};
 use tcod::colors::Color;
 
@@ -21,11 +22,13 @@ impl Component for Renderable {
     type Storage = VecStorage<Self>;
 }
 
-#[derive(Debug, Default)]
-pub struct Mobile;
+#[derive(Debug)]
+pub struct Mobile {
+    pub direction: Direction,
+}
 
 impl Component for Mobile {
-    type Storage = NullStorage<Self>;
+    type Storage = VecStorage<Self>;
 }
 
 #[derive(Debug, Default)]

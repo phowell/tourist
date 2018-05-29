@@ -1,10 +1,9 @@
-use specs::{Dispatcher, DispatcherBuilder, World};
-use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscreen, Root},
-           input::{Event, EventFlags}};
-
 use components::{Mobile, Player, Position, Renderable};
-use resources::{InputEvents, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
+use resources::{ActionQueue, Direction, InputEvents, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
+use specs::{Dispatcher, DispatcherBuilder, World};
+use std::collections::VecDeque;
 use systems::HandleInput;
+use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscreen, Root}};
 
 pub struct Engine<'a> {
     world: World,
@@ -34,15 +33,19 @@ impl<'a> Engine<'a> {
 
         //resources
         world.add_resource(InputEvents(Vec::new()));
-        let mut dispatcher = DispatcherBuilder::new()
+        world.add_resource(ActionQueue(VecDeque::new()));
+
+        let dispatcher = DispatcherBuilder::new()
             .with(HandleInput, "HandleInput", &[])
+            //todo: add .with(system_name) as needed between new() and build();
             .build();
-        //todo: add .with(system_name) as needed between new() and build();
 
         world
             .create_entity()
             .with(Position { x: 1, y: 1 })
-            .with(Mobile)
+            .with(Mobile {
+                direction: Direction::Still,
+            })
             .with(Player)
             .with(Renderable {
                 color: colors::WHITE,
@@ -50,8 +53,6 @@ impl<'a> Engine<'a> {
             });
 
         let running = true;
-
-        
 
         Engine {
             world,
