@@ -2,7 +2,7 @@ use components::{Mobile, Player, Position, Renderable};
 use resources::{ActionQueue, Direction, InputEvents, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
 use specs::{Dispatcher, DispatcherBuilder, World};
 use std::collections::VecDeque;
-use systems::HandleInput;
+use systems::{HandleInput, Motion};
 use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscreen, Root}};
 
 pub struct Engine<'a> {
@@ -37,6 +37,7 @@ impl<'a> Engine<'a> {
 
         let dispatcher = DispatcherBuilder::new()
             .with(HandleInput, "HandleInput", &[])
+            .with(Motion, "Motion", &["HandleInput"])
             //todo: add .with(system_name) as needed between new() and build();
             .build();
 
@@ -88,6 +89,7 @@ impl<'a> Engine<'a> {
     fn update(&mut self) {
         self.dispatcher.dispatch(&mut self.world.res);
         self.world.maintain();
+
     }
 
     fn handle_input(&mut self) {
