@@ -1,5 +1,5 @@
 use resources::Direction;
-use specs::{Component, NullStorage, VecStorage};
+use specs::{Component, VecStorage};
 use tcod::colors::Color;
 
 #[derive(Debug)]
@@ -35,5 +35,5 @@ impl Component for Mobile {
 pub struct Player;
 
 impl Component for Player {
-    type Storage = NullStorage<Self>;
+    type Storage = VecStorage<Self>;
 }

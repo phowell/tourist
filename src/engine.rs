@@ -1,9 +1,13 @@
 use components::{Mobile, Player, Position, Renderable};
 use resources::{ActionQueue, Direction, InputEvents, LIMIT_FPS, SCREEN_HEIGHT, SCREEN_WIDTH};
-use specs::{Dispatcher, DispatcherBuilder, World};
+use specs::{Dispatcher, DispatcherBuilder, Join, World};
 use std::collections::VecDeque;
-use systems::HandleInput;
-use tcod::{colors, input, system, console::{blit, FontLayout, FontType, Offscreen, Root}};
+use systems::{HandleInput, Motion};
+use tcod::{colors,
+           console::{blit, FontLayout, FontType, Offscreen, Root},
+           input,
+           system,
+           Console};
 
 pub struct Engine<'a> {
     world: World,
@@ -37,7 +41,8 @@ impl<'a> Engine<'a> {
 
         let dispatcher = DispatcherBuilder::new()
             .with(HandleInput, "HandleInput", &[])
-            //todo: add .with(system_name) as needed between new() and build();
+            .with(Motion, "Motion", &["HandleInput"])
+            //todo: add .with(system_name, 'systemName' &[deps]) as needed between new() and build();
             .build();
 
         world
@@ -66,15 +71,24 @@ impl<'a> Engine<'a> {
         system::set_fps(LIMIT_FPS);
 
         while self.running {
+            self.root.flush();
             self.running = !self.root.window_closed();
             self.handle_input();
             self.update();
             self.render();
-            self.root.flush();
         }
     }
 
     fn render(&mut self) {
+        let positions = self.world.read_storage::<Position>();
+        let renderables = self.world.read_storage::<Renderable>();
+        //println!("testing>>>>");
+        for (pos, rend) in (&positions, &renderables).join() {
+            self.console
+                .put_char_ex(pos.x, pos.y, rend.character, rend.color, colors::WHITE);
+            println!(">>Player{}:{}", pos.x, pos.y);
+        }
+
         blit(
             &mut self.console,
             (0, 0),
@@ -103,7 +117,12 @@ impl<'a> Engine<'a> {
             )) => self.running = false,
 
             //Every other input
-            Some(e) => self.world.write_resource::<InputEvents>().0.push(e.1),
+            Some(e) => {
+                println!(".....{:?}", e.1);
+                let x = self.world.write_resource::<InputEvents>().0.push(e.1);
+                //println!("{:?}", e.1);
+                x
+            }
 
             //No input occurred
             _ => {}
