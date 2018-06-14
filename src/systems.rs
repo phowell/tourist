@@ -49,7 +49,6 @@ impl<'a> System<'a> for Motion {
     type SystemData = (WriteStorage<'a, Mobile>, WriteStorage<'a, Position>);
 
     fn run(&mut self, (mut mobile, mut position): Self::SystemData) {
-<<<<<<< HEAD
         println!("<<<");
         for (mob, pos) in (&mut mobile, &mut position).join() {
             match mob.direction {
@@ -63,27 +62,4 @@ impl<'a> System<'a> for Motion {
             println!("Yowza>>{}:{}", pos.x, pos.y);
         }
     }
-=======
-        for (mob, pos) in (&mut mobile, &mut position).join() {
-            let mut x: i32 = 0;
-            let mut y: i32 = 0;
-            match mob.direction{
-                Direction::N => x += 1,
-                Direction::E => y += 1,
-                Direction::S => x -= 1,
-                Direction::W => y -= 1,
-                _ => {}
-            }
-            pos.x += x;
-            pos.y += y;
-            mob.direction = Direction::Still;
-        }
-    }
-}
-
-pub struct Render;
-
-impl<'a> System<'a> for Render{
-    type SystemData = (Write<'a, Console>);
->>>>>>> d6e600fefaf6782f18bba2fead73044ecafbceff
 }
